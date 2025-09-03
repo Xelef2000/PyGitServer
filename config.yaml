@@ -1,0 +1,17 @@
+# Configuration for the Python Git server
+server:
+  host: "0.0.0.0"  # Host to bind to. 0.0.0.0 makes it accessible on the network.
+  port: 8000       # Port to listen on.
+
+# List of repositories to serve.
+# 'name' is used in the URL (e.g., http://host/repo-name)
+# 'path' is the location on the disk.
+# 'init_from' (optional) will clone a remote repo instead of creating an empty one.
+repositories:
+  - name: "my-first-repo"
+    path: "./repos/my-first-repo.git"
+  - name: "another-project"
+    path: "./repos/another-project.git"
+  - name: "git-mirror"
+    path: "./repos/git-mirror.git"
+    init_from: "https://github.com/git/git.git" # Example: clones the official Git repo on init.
