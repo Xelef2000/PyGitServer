@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pygitserver.fullname" . }}
+  labels:
+    {{- include "pygitserver.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pygitserver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pygitserver.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: GIT_SERVER_CFG
+              value: "/git/conf.yaml"
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: http
+          volumeMounts:
+            - name: git-repos
+              mountPath: /git/repos
+            - name: config
+              mountPath: /git/conf.yaml
+              subPath: conf.yaml
+      volumes:
+        - name: git-repos
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "pygitserver.fullname" . }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "pygitserver.fullname" . }}-config

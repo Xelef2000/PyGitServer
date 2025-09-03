@@ -15,3 +15,6 @@ repositories:
   - name: "git-mirror"
     path: "./repos/git-mirror.git"
     init_from: "https://github.com/git/git.git" # Example: clones the official Git repo on init.
+  - name: "git-mirror2"
+    path: "./repos/git-mirror2.git"
+    init_from: "" 

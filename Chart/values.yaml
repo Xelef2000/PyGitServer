@@ -1,0 +1,38 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/xelef2000/pygitserver
+  pullPolicy: IfNotPresent
+  tag: "v1.1.0"
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  #  kubernetes.io/ingress.class: "nginx"
+  #  cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: git.example.com
+  tls: []
+  #  - secretName: git-example-com-tls
+  #    hosts:
+  #      - git.example.com
+
+persistence:
+  enabled: true
+  # If you don't specify a storageClassName, the default provisioner will be used.
+  storageClassName: ""
+  size: 1Gi
+
+# -- Define the repositories to be served.
+# 'name' is the repository name used in the URL.
+# 'init_from' is an optional remote URL to clone from on initial setup.
+repositories:
+  - name: "my-first-repo"
+    init_from: "" # e.g., "https://github.com/git/git.git"
+  - name: "another-repo"
+    init_from: ""

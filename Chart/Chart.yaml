@@ -1,0 +1,8 @@
+apiVersion: v2
+name: PyGitServer
+description: A Helm chart for deploying a simple Python Git server.
+type: application
+
+version: 0.1.0
+
+appVersion: "v1.1.0"

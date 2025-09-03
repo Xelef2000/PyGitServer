@@ -1,0 +1,38 @@
+name: Release Helm Chart
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to write releases, and to push to the gh-pages branch
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # Fetches all history for all tags and branches
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.15.2' # Specify a version of Helm to ensure consistency
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          # The path to your chart directory
+          charts_dir: ./Chart
+        env:
+          # This token is created automatically by GitHub
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
