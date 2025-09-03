@@ -1,7 +1,6 @@
 # PyGitServer: A Simple Python HTTP Git Server
 
-This project provides a bare-bones, multi-repository Git server that runs over HTTP. It's built using only Python's standard libraries and requires a local git installation to function.
-
+This project provides a bare-bones, multi-repository Git server that runs over HTTP. 
 On its first run, it will automatically create the "bare" Git repositories for you based on your configuration.
 
 **Disclaimer:** This server has no authentication or authorization. Anyone with network access to the server can clone and push to any repository. **Do not use this in an untrusted environment.**
