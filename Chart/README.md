@@ -1,6 +1,6 @@
 # PyGitServer
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.1.0](https://img.shields.io/badge/AppVersion-v1.1.0-informational?style=flat-square)
+![Version: 1.3.3](https://img.shields.io/badge/Version-1.3.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.1.0](https://img.shields.io/badge/AppVersion-v1.1.0-informational?style=flat-square)
 
 A Helm chart for deploying a simple Python Git server.
 
@@ -20,7 +20,7 @@ A Helm chart for deploying a simple Python Git server.
 | persistence.size | string | `"1Gi"` |  |
 | persistence.storageClassName | string | `""` |  |
 | replicaCount | int | `1` |  |
-| repositories | list | `[{"init_from":"","name":"my-first-repo"},{"init_from":"","name":"another-repo"}]` | Define the repositories to be served. 'name' is the repository name used in the URL. 'init_from' is an optional remote URL to clone from on initial setup. |
+| repositories | list | `[{"init_from":"","name":"my-first-repo"},{"init_from":"git@github.com:Xelef2000/kubernetes-lab-argocd-configs.git","name":"argocd-configs"}]` | Define the repositories to be served. 'name' is the repository name used in the URL. 'init_from' is an optional remote URL to clone from on initial setup. |
 | service.port | int | `8000` |  |
 | service.type | string | `"ClusterIP"` |  |
 

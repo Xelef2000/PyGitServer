@@ -34,5 +34,5 @@ persistence:
 repositories:
   - name: "my-first-repo"
     init_from: "" # e.g., "https://github.com/git/git.git"
-  - name: "kubernetes-lab-argocd-configs"
+  - name: "argocd-configs"
     init_from: "git@github.com:Xelef2000/kubernetes-lab-argocd-configs.git"
