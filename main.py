@@ -88,7 +88,8 @@ def setup_repositories(repos):
 # --- Git Server Logic ---
 class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     """
-    A request handler that serves multiple Git repositories over HTTP.
+    A request handler that serves multiple Git repositories over HTTP,
+    including health check endpoints.
     """
     def get_repo_path(self):
         """Parses the request URL to find the repo name and get its disk path."""
@@ -104,6 +105,14 @@ class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             return None, f"Repository '{repo_name}' not found on server."
         
         return repo_path, None
+
+    def _send_text_response(self, status_code, message):
+        """Sends a simple plain text response."""
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'text/plain; charset=utf-8')
+        self.send_header('Content-Length', str(len(message)))
+        self.end_headers()
+        self.wfile.write(message.encode('utf-8'))
 
     def _send_headers(self, status_code, content_type, extra_headers=None):
         """Send common headers for a Git HTTP response."""
@@ -136,9 +145,32 @@ class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             print(f"An unexpected error occurred: {e}")
             self.send_error(500, "Internal Server Error.")
             return None
+            
+    def handle_liveness_probe(self):
+        """Handles the /healthz/live endpoint. Responds 200 OK if server is running."""
+        print(f"Received liveness probe from {self.client_address[0]}")
+        self._send_text_response(200, "OK")
+
+    def handle_readiness_probe(self):
+        """
+        Handles the /healthz/ready endpoint.
+        Checks if all configured repository paths exist on disk.
+        """
+        print(f"Received readiness probe from {self.client_address[0]}")
+        missing_repos = []
+        for name, path in REPO_MAP.items():
+            if not os.path.isdir(path):
+                missing_repos.append(name)
+        
+        if not missing_repos:
+            self._send_text_response(200, "Ready")
+        else:
+            error_message = f"Service Unavailable: The following repositories are not accessible: {', '.join(missing_repos)}"
+            print(f"Readiness probe failed: {error_message}")
+            self._send_text_response(503, error_message)
 
     def process_request(self, service_name_suffix):
-        """Generic handler for both GET and POST."""
+        """Generic handler for both GET and POST for Git operations."""
         repo_path, error = self.get_repo_path()
         if error:
             self.send_error(404, error)
@@ -197,9 +229,17 @@ class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(output)
 
     def do_GET(self):
-        self.process_request(None)
+        """Handle GET requests, routing health checks or Git operations."""
+        path = urlparse(self.path).path
+        if path == '/healthz/live':
+            self.handle_liveness_probe()
+        elif path == '/healthz/ready':
+            self.handle_readiness_probe()
+        else:
+            self.process_request(None)
 
     def do_POST(self):
+        """Handle POST requests for Git operations."""
         service_name = os.path.basename(urlparse(self.path).path)
         if service_name not in ('git-upload-pack', 'git-receive-pack'):
             self.send_error(404, "Service not found.")
@@ -219,10 +259,13 @@ if __name__ == "__main__":
         print(f"Serving {len(REPO_MAP)} Git repositories on http://{HOST}:{PORT}")
         for name in REPO_MAP:
             print(f" -> http://{HOST}:{PORT}/{name}")
+        print("\nHealth Probes:")
+        print(f" Liveness: http://{HOST}:{PORT}/healthz/live")
+        print(f" Readiness: http://{HOST}:{PORT}/healthz/ready")
+
         print("\nServer is running. Press Ctrl+C to shut down.")
         try:
             server.serve_forever()
         except KeyboardInterrupt:
             print("\nServer shutting down.")
             server.shutdown()
-
