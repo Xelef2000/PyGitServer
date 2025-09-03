@@ -8,18 +8,14 @@ on:
       - main
 
 jobs:
-  semantic-release:
+  release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - name: Run go-semantic-release
-        id: semrel
-        uses: go-semantic-release/action@v1.24
-        with:
-          github-token: ${{ secrets.PAT }}
-          allow-initial-development-versions: true
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          go-semantic-release
