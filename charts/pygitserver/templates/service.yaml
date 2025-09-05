@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "pygitserver.fullname" . | lower }}
+  name: {{ include "pygitserver.fullname" . }}
   labels:
     {{- include "pygitserver.labels" . | nindent 4 }}
 spec:
