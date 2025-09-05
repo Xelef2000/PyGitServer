@@ -3,6 +3,6 @@ name: PyGitServer
 description: A Helm chart for deploying a simple Python Git server.
 type: application
 
-version: 1.3.5
+version: 1.3.6
 
-appVersion: "v1.3.5"
+appVersion: "v1.3.6"

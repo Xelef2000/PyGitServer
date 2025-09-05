@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "pygitserver.fullname" . }}-config
+  name: {{ include "pygitserver.fullname" . | lower }}-config
   labels:
     {{- include "pygitserver.labels" . | nindent 4 }}
 data:

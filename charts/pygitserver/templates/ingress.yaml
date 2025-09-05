@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "pygitserver.fullname" . }}
+  name: {{ include "pygitserver.fullname" . | lower }}
   labels:
     {{- include "pygitserver.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
@@ -33,7 +33,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ include "pygitserver.fullname" $ }}
+                name: {{ include "pygitserver.fullname" . | lower }}
                 port:
                   name: http
           {{- end }}
