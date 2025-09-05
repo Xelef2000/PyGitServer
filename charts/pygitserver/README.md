@@ -1,6 +1,6 @@
-# PyGitServer
+# pygitserver
 
-![Version: 1.3.6](https://img.shields.io/badge/Version-1.3.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.3.6](https://img.shields.io/badge/AppVersion-v1.3.6-informational?style=flat-square)
+![Version: 1.3.7](https://img.shields.io/badge/Version-1.3.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v1.3.7](https://img.shields.io/badge/AppVersion-v1.3.7-informational?style=flat-square)
 
 A Helm chart for deploying a simple Python Git server.
 
@@ -10,7 +10,7 @@ A Helm chart for deploying a simple Python Git server.
 |-----|------|---------|-------------|
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"ghcr.io/xelef2000/pygitserver"` |  |
-| image.tag | string | `"v1.3.6"` |  |
+| image.tag | string | `"v1.3.7"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
