@@ -31,4 +31,15 @@ entries:
     urls:
     - https://github.com/Xelef2000/PyGitServer/releases/download/PyGitServer-1.3.4/PyGitServer-1.3.4.tgz
     version: 1.3.4
-generated: "2025-09-05T07:59:39.558387662Z"
+  pygitserver:
+  - apiVersion: v2
+    appVersion: v1.3.7
+    created: "2025-09-05T08:05:32.670496921Z"
+    description: A Helm chart for deploying a simple Python Git server.
+    digest: 254ce0d104b95f872669faf92e8463c9b18eae7156b4515ca484815289da32a1
+    name: pygitserver
+    type: application
+    urls:
+    - https://github.com/Xelef2000/PyGitServer/releases/download/pygitserver-1.3.7/pygitserver-1.3.7.tgz
+    version: 1.3.7
+generated: "2025-09-05T08:05:32.670552966Z"
