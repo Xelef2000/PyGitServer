@@ -19,8 +19,25 @@ try:
     HOST = config['server']['host']
     PORT = config['server']['port']
     REPOS_CONFIG = config['repositories']
-    # Create a mapping from repo name to repo path for quick lookups
-    REPO_MAP = {repo['name']: repo['path'] for repo in REPOS_CONFIG}
+    
+    # --- UPDATED SECTION START ---
+    # Create a mapping from repo name to repo path for quick lookups.
+    # We populate keys for BOTH 'repo' and 'repo.git' to allow flexible URLs.
+    REPO_MAP = {}
+    for repo in REPOS_CONFIG:
+        name = repo['name']
+        path = repo['path']
+        
+        # 1. Add the canonical name defined in config
+        REPO_MAP[name] = path
+        
+        # 2. Add the alias (if config has .git, add version without, and vice versa)
+        if name.endswith('.git'):
+            REPO_MAP[name[:-4]] = path
+        else:
+            REPO_MAP[f"{name}.git"] = path
+    # --- UPDATED SECTION END ---
+
 except FileNotFoundError:
     print(f"Error: Configuration file not found at '{config_path}'.")
     print("Please create the file or set the GIT_SERVER_CFG environment variable to its location.")
@@ -94,11 +111,14 @@ class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def get_repo_path(self):
         """Parses the request URL to find the repo name and get its disk path."""
         # The first part of the path is the repo name. e.g., /my-repo/info/refs
+        # This regex captures everything up to the second slash.
         match = re.match(r'^/([^/]+)', self.path)
         if not match:
             return None, "Invalid repository URL."
 
         repo_name = match.group(1)
+        
+        # This lookup now works for "repo" AND "repo.git" due to the updated REPO_MAP
         repo_path = REPO_MAP.get(repo_name)
         
         if not repo_path or not os.path.isdir(repo_path):
@@ -158,14 +178,17 @@ class GitHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         """
         print(f"Received readiness probe from {self.client_address[0]}")
         missing_repos = []
-        for name, path in REPO_MAP.items():
+        # We iterate over unique paths to avoid checking the same folder twice (due to aliases)
+        unique_paths = set(REPO_MAP.values())
+        
+        for path in unique_paths:
             if not os.path.isdir(path):
-                missing_repos.append(name)
+                missing_repos.append(path)
         
         if not missing_repos:
             self._send_text_response(200, "Ready")
         else:
-            error_message = f"Service Unavailable: The following repositories are not accessible: {', '.join(missing_repos)}"
+            error_message = f"Service Unavailable: The following paths are not accessible: {', '.join(missing_repos)}"
             print(f"Readiness probe failed: {error_message}")
             self._send_text_response(503, error_message)
 
@@ -256,9 +279,11 @@ if __name__ == "__main__":
         exit(1)
 
     with socketserver.TCPServer((HOST, PORT), GitHTTPRequestHandler) as server:
-        print(f"Serving {len(REPO_MAP)} Git repositories on http://{HOST}:{PORT}")
-        for name in REPO_MAP:
+        print(f"Serving {len(REPO_MAP)} Git repository URLs on http://{HOST}:{PORT}")
+        # Print unique paths to avoid cluttering logs, or print all aliases
+        for name in sorted(REPO_MAP.keys()):
             print(f" -> http://{HOST}:{PORT}/{name}")
+            
         print("\nHealth Probes:")
         print(f" Liveness: http://{HOST}:{PORT}/healthz/live")
         print(f" Readiness: http://{HOST}:{PORT}/healthz/ready")
